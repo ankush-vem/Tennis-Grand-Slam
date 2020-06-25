@@ -1,0 +1,211 @@
+---
+title: "ETC5513-Assignment 2"
+author: "Ankush Vemagal"
+output:
+  bookdown::pdf_document2:
+  bookdown::html_document2:
+    df_print: paged
+    theme: cerulean
+    toc: yes
+    toc_depth: '2'
+always_allow_html: yes
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE,
+                      message = FALSE, 
+                      warning = FALSE, 
+                      fig.align = "center", fig.path = "Images/")
+```
+
+<style>
+body {
+text-align: justify}
+</style>
+
+\newpage
+
+# Introduction
+
+Tennis, original known as Lawn Tennis, was invented in 1873 by Londoner Major Walter Wingfield. The first grand slam, Wimbledon was held in United Kingdom (UK) in the year 1877. The final was played between Spencer Gore and William Marshall. Spencer Gore, a tennis player from UK won the first grand slam.
+ 
+Tennis is a racquet sport that can be played individually against a single opponent (Singles) or between two teams of two players each (Doubles). In a tournament, there are mainly Men's Singles, Men's Doubles, Women's Singles, Women's Doubles and Mixed Doubles. 
+
+
+# Rules of Tennis
+
+-	A ball must land within bounds for play to continue, if a player hits the ball outside of bounds, this results in the loss of the point for them.
+-	Players/teams cannot touch the net or posts or cross onto the opponent's side nor hit the ball twice.
+- Players/teams cannot carry the ball or catch it with the racquet.
+- Players cannot hit the ball twice.
+-	Players must wait until the ball passes the net before they return it.
+- A player that does not return a live ball before it bounces twice loses the point.
+- If the ball hits or touches the players, that counts as a penalty.
+- If the racquet leaves the hand or verbal abuse occurs, a penalty is given.
+- Any ball that bounces on the lines of boundary are considered good.
+-	A serve must bounce first before the receiving player can return it.
+
+
+```{r echo=FALSE, out.width='80%'}
+#including an external image 
+knitr::include_graphics(here::here("Images","court.png"))
+```
+
+\newpage
+
+## Point - Game - Set - Match
+
+- **Point**: Starting at love (0 points), points increment from 15-30-40-Game.
+
+- **Game**: A game consist of 4 points, as the leading player has at-least a 2 point advantage.
+
+- **Set**: A set is won when a player wins 6 games with a lead of at-least 2 games.
+
+- **Match**: Whichever player/team wins the majority of sets win the match. Generally an odd number ( 3 or 5 sets).
+
+- **Advantage Set**: If a game score of 6-6 is reached and advantage set rules are used, a player/team can only win a set with a 2 game lead.
+
+- **Deuce**: Occurs if a score of 40-40 is reached. In order to win the game, a player/team must win 2 consecutive points in order to take the game. If a player wins one point, they have advantage, but if they lose the next point, the score returns to deuce.
+
+- **Tie-break game**: If a game score of 6-6 is reached and tie-break set rules are used, players must play a tie-break game in order to decide who wins the set. In a tie-break game, a player/team must reach 7 points with a two point advantage to win. For the serving format of a tie-break game, player 1 serves for the first point, player 2 serves for the next two points, player 1 serves for the next two points after that, etc.
+
+## Equipment
+
+- **Racquet**: A racquet is comprised of a handle, a frame, and strings that are bound in a crisscross weaving pattern. A racquet’s frame should not exceed 32 inches in length, with a handle no longer than 12.5 inches in width, and a surface no more than 15.5 inches in overall length or 11.5 inches in width. There can also be no objects or devices on the racquet except for ones that prevent vibration and wear and tear.
+
+- **Ball**: A tennis ball is white or yellow in color for tournaments, with measurements of 2-1/2 to 2-5/8 inches in diameter and weighing anywhere from 2 to 2-1/16 ounces. The elasticity of the ball and the uniform outer surface are also determined by approved specifications.
+
+``` {r library packages involved}
+library(readr)
+library(kableExtra)
+library(tidyverse)
+library(knitr)
+library(ggplot2)
+library(plotly)
+library(dplyr)
+library(here)
+```
+
+``` {r getting the data in R}
+tennis <- read_csv(here::here("Data","tennis.csv"))
+```
+
+``` {r writing data}
+write.csv(tennis, file = "Data/tennis.csv")
+```
+
+\newpage
+
+# Grand Slams
+
+There are 4 major Grand Slams held in a calendar year, they are: Australian Open (Australia), French Open (France), Wimbledon (UK), U.S Open (USA) and are played on hard, clay, grass, and hard court respectively. There was one instance when Australian Open was held twice in a year in 1977. 
+
+With referance to Table \@ref(tab:grandslams) , there are 4 major Grand Slams held in a calendar year, they are: Australian Open (Australia), French Open (France), Wimbledon (UK), U.S Open (USA) and are played on hard, clay, grass, and hard court respectively. There was one instance when Australian Open was held twice in a year in 1977. 
+
+``` {r grandslams}
+table(tennis$TOURNAMENT) %>% 
+  knitr::kable(booktabs = TRUE,
+               col.names = c("Grand Slams","Number"),
+               caption = 'Number of Grand Slams from 1877-2019') %>% 
+  kable_styling(latex_options = c("striped", "hold_position"))
+```
+
+## Most Number of Grand Slams Won 
+
+### Men's Singles
+
+Table \@ref(tab:win) shows the player with the highest number of Grand Slam titles in Men's Singles category.  
+
+``` {r win}
+winners <- tennis %>% count(WINNER,sort = TRUE) 
+
+head(winners,10) %>% 
+  knitr::kable(booktabs = TRUE,
+               col.names = c("Name","Number"),
+               caption = 'Top 10 with Most Grand Slam Titles') %>% 
+  kable_styling(latex_options = c("striped", "hold_position"))
+```
+
+\newpage
+
+## Roger Federer
+
+Roger Federer, 38 years, was born in Basel, Switzerland, is a Swiss professional tennis player who has won the most Grand Slam Titles in the history of tennis till 2019. He is currently ranked Number 4 in the world. Figure \@ref(fig:RF) indicates the tournament along with the opponents whom he defeated in the Grand Slam Final. 
+
+``` {r RF, fig.cap = "Roger Federer vs Runner-Up in Grand Slam Final Victory", fig.width=10, fig.height=6}
+
+RogerWon<- tennis %>% dplyr::filter(WINNER %in% c("Roger Federer"))
+
+Roger <- ggplot(data = RogerWon, mapping = aes(y=`RUNNER-UP`,
+                               x=YEAR,
+                               col=TOURNAMENT)) +
+  ggtitle("Roger Federer vs Runner-Up") +
+  geom_point()
+
+ggplotly(Roger)
+
+```
+
+**Note:** For better viewing of the **inter-active plot**, the (.html) version is recommended.
+
+\newpage
+
+# Australian Open
+
+The Australian Open is a tennis tournament held annually over the last fortnight of January in the sporting capital of the world, Melbourne, Australia. The tournament is the first of the four Grand Slam tennis events held each year excepting 1986. It features men's and women's singles; men's, women's, and mixed doubles; junior's championships; and wheelchair, legends, and exhibition events. Prior to 1988 it was played on grass courts, but since then three types of hardcourt surfaces have been used at Melbourne Park – green coloured Rebound Ace up to 2007, blue Plexicushion from 2008 to 2019, and blue GreenSet since 2020.
+
+``` {r}
+AusOpen <- tennis %>% dplyr::filter(TOURNAMENT %in% "Australian Open") 
+```
+
+## Most Australian Open Titles 
+
+Table \@ref(tab:AusTitles) shows the player with the most number of Australian Open Victories in Finals. 
+
+``` {r AusTitles}
+WinAus <- AusOpen %>% count(WINNER, sort = TRUE) %>% head(10) %>% 
+  knitr::kable(booktabs = TRUE,
+               col.names = c("Name","Number"),
+               caption = 'Most Australian Open Grand Slam Titles') %>% 
+  kable_styling(latex_options = c("striped", "hold_position"))
+
+WinAus
+
+```
+
+\newpage
+
+## Novak Djokovic
+
+Figure \@ref(fig:Top) shows the Top 10 players with the number of Australian Open Title along with their opponents. Novak Djokovic, from Serbia has an all-time record of 7 Australian Open Men's singles titles. He is currently ranked World number 1. 
+
+**Update:** As per the Australian Open in 2020, Novak Djokovic, now has won 8 Australian Open Grand Slams. (Final: Novak Djokovic vs Dominic Thiem). 
+
+``` {r Top, fig.cap = "Top 10 tennis players with most number of Australian Open Titles",fig.width=10, fig.height=8}
+
+Top10 <- AusOpen %>% dplyr::filter(WINNER %in% c("Novak Djokovic", "Roger Federer",
+                                               "Roy Emerson","Andre Agassi","Jack Crawford",
+                                               "Ken Rosewall","Pat O'Hara Wood",
+                                               "Adrian Quist","Mats Wilander","Rod Laver"))
+
+
+ggplot(data = Top10, mapping = aes(y=WINNER,fill=`RUNNER-UP`)) +
+  geom_bar(width = 0.5) +
+  scale_colour_viridis_c() +
+  xlab("Number of Titles") + 
+  ylab("Player") +
+  ggtitle("Top 10 Players with most Australian Open Titles")
+
+
+
+```
+
+\newpage
+
+# Conclusion
+
+In conclusion, there are four major grand slams in tennis held in four different countries in a calendar year. There are three types of surfaces used for playing tennis, namely: hard, clay and grass court. This data collected ranges from a period of 1877 - 2019 of the face off in the finals of Men's Singles. Roger Federer, currently ranked number 4 has an all-time record of 20 Grand Slam titles which comprises of 6 Australian Open, 1 French Open, 8 Wimbledon and 5 U.S Open titles. Across the four Grand Slams, in Australian Open, Novak Djokovic, currently ranked number 1 has won the most number of Australian Open titles (7). 
+
+
+**Dataset Source:** _Kaggle_
+
